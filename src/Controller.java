@@ -34,7 +34,7 @@ public class Controller implements KeyListener {
     public void keyReleased(KeyEvent e) {
         String inputString = view.getInputPanel().getInput();
         if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-            predictor.update(view.getInputPanel().getInput());
+            predictor.addWord(view.getInputPanel().getInput());
             view.getInputPanel().reset();
         }
         else

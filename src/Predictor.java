@@ -7,7 +7,9 @@ import java.util.Map;
  */
 public class Predictor {
 
-    Map<Character, Map<String, Integer>> database;
+    public static final int WORD_DEPTH = 3;
+
+    Map<String, Map<String, Integer>> database;
 
     private PredictorListener listener;
 
@@ -27,25 +29,49 @@ public class Predictor {
         }
     }
 
-    public void update(String word) {
-        char firstChar = word.toCharArray()[0];
-        Map<String, Integer> predictionMap = new HashMap<>();
+    /**
+     * Adds a word to the database.
+     *
+     * @param word a string where the first word will be added to the database
+     */
+    public void addWord(String word) {
+        word = word.split(" ")[0].trim();
 
-        if (database.get(firstChar) != null) {
-            predictionMap = database.get(firstChar);
-            if (predictionMap.get(word) != null)
-                predictionMap.put(word, predictionMap.get(word) + 1);
-            else
+        for (int i = 1; i <= WORD_DEPTH && i <= word.length(); i++) {
+            String subStr = word.substring(0, i);
+
+            Map<String, Integer> predictionMap = new HashMap<>();
+
+            if (database.get(subStr) != null) {
+                predictionMap = database.get(subStr);
+                if (predictionMap.get(word) != null)
+                    predictionMap.put(word, predictionMap.get(word) + 1);
+                else
+                    predictionMap.put(word, 1);
+            } else {
                 predictionMap.put(word, 1);
-        } else {
-            predictionMap.put(word, 1);
-            database.put(firstChar, predictionMap);
+                database.put(subStr, predictionMap);
+            }
         }
     }
 
-    public void update(char[] character) {
-        if (character.length != 0 && database.containsKey(character[0]))
-            firePrediction(findMostLikelyCandidate(database.get(character[0])));
+    public void update(char[] characters) {
+        if (characters.length > WORD_DEPTH) {
+            firePrediction("");
+            return;
+        }
+        String inString = String.valueOf(characters);
+        String startStr = "";
+
+        for (int i = 1; i <= inString.length(); i++) {
+            if (database.containsKey(inString.substring(0, i)))
+                startStr = inString.substring(0, i);
+            else
+                break;
+        }
+
+        if (!startStr.equals("") && database.containsKey(inString))
+            firePrediction(findMostLikelyCandidate(database.get(startStr)));
         else
             firePrediction("");
     }
