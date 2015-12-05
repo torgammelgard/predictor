@@ -35,7 +35,7 @@ public class Predictor {
      * @param word a string where the first word will be added to the database
      */
     public void addWord(String word) {
-        word = word.split(" ")[0].trim();
+        word = word.trim().split(" ")[0];
 
         for (int i = 1; i <= WORD_DEPTH && i <= word.length(); i++) {
             String subStr = word.substring(0, i);

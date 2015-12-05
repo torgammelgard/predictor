@@ -14,7 +14,7 @@ public class Controller implements KeyListener {
         predictor = m;
         view = v;
 
-        v.getInputPanel().addKeyListenerOnTextField(this);
+        v.getInputPanel().addKeyListenerOnTextPane(this);
         m.setPredictorListener(v);
     }
 
@@ -32,13 +32,13 @@ public class Controller implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        String inputString = view.getInputPanel().getInput();
         if (e.getKeyChar() == KeyEvent.VK_ENTER) {
             predictor.addWord(view.getInputPanel().getInput());
             view.getInputPanel().reset();
         }
-        else
-            predictor.update(inputString.toCharArray());
+        else {
+            predictor.update(view.getInputPanel().getInput().toCharArray());
+        }
 
     }
 }

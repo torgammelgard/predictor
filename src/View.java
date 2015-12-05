@@ -1,4 +1,7 @@
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.KeyListener;
 
@@ -9,19 +12,17 @@ import java.awt.event.KeyListener;
 public class View extends JFrame implements PredictorListener {
 
     InputPanel inputPanel;
-    OutputPanel outputPanel;
     String prediction;
 
     public View() {
 
         inputPanel = new InputPanel();
-        outputPanel = new OutputPanel();
 
         setLayout(new FlowLayout());
         add(inputPanel);
-        add(outputPanel);
+        add(inputPanel);
 
-        setTitle("MVC Extended");
+        setTitle("Predictor");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         pack();
         setLocationRelativeTo(null);
@@ -34,7 +35,7 @@ public class View extends JFrame implements PredictorListener {
 
     private void setPrediction(String prediction) {
         this.prediction = prediction;
-        outputPanel.setTextFieldText(prediction);
+        inputPanel.appendPrediction(prediction);
     }
 
     @Override
@@ -43,38 +44,103 @@ public class View extends JFrame implements PredictorListener {
         setPrediction(prediction);
     }
 
-    class CustomPanel extends JPanel {
-        protected JTextField textField;
 
-        CustomPanel() {
-            textField = new JTextField();
-            textField.setPreferredSize(new Dimension(400, 50));
-            textField.setFont(new Font("Serif", Font.BOLD, 32));
-            textField.setForeground(Color.BLACK);
-            add(textField);
+    class InputPanel extends JPanel {
+        protected JTextPane textPane;
+        StyledDocument doc;
+        String appendedPrediction = "";
+        int predictionOffset = 0;
+
+        // help from java2s.com
+        InputPanel() {
+            doc = new DefaultStyledDocument() {
+                @Override
+                public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+                    // making the document contain ONE line only
+                    if (str.equals("\n"))
+                        return;
+                    super.insertString(offs, str, a);
+                }
+            };
+
+            doc.addDocumentListener(new MyDocumentListener());
+            textPane = new JTextPane(doc);
+            textPane.setEditable(true);
+            textPane.setPreferredSize(new Dimension(400, 100));
+            textPane.setFont(new Font("Serif", Font.PLAIN, 48));
+            JScrollPane scrollPane = new JScrollPane(textPane);
+            add(scrollPane);
         }
 
-        public void setTextFieldText(String text) {
-            textField.setText(text);
+        public void addKeyListenerOnTextPane(KeyListener listener) {
+            textPane.addKeyListener(listener);
         }
-        public void addKeyListenerOnTextField(KeyListener listener) {
-            textField.addKeyListener(listener);
+
+        boolean editingPrediction = false;
+
+        public void appendPrediction(String prediction) {
+            if (appendedPrediction.length() > 0) {
+                try {
+                    doc.remove(predictionOffset, appendedPrediction.length());
+                    appendedPrediction = "";
+                } catch (BadLocationException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (!prediction.equals("")) {
+                editingPrediction = true;
+                try {
+                    MutableAttributeSet attributeSet = textPane.getInputAttributes();
+                    StyleConstants.setForeground(attributeSet, Color.RED);
+
+                    if (doc.getLength() < prediction.length()) {
+                        appendedPrediction = prediction.substring(getInput().length(), prediction.length());
+                        if (appendedPrediction.length() > 0) {
+                            predictionOffset = doc.getLength();
+                            doc.insertString(predictionOffset, appendedPrediction, attributeSet);
+                            textPane.setCaretPosition(getInput().length());
+                        }
+                    }
+                } catch (BadLocationException e) {
+                    e.printStackTrace();
+                }
+                editingPrediction = false;
+            }
+            MutableAttributeSet attributeSet = textPane.getInputAttributes();
+            StyleConstants.setForeground(attributeSet, Color.BLACK);
+
         }
 
         public String getInput() {
-            return textField.getText();
+            return textPane.getText().replace(appendedPrediction, "");
         }
 
         public void reset() {
-            textField.setText("");
+            textPane.setText("");
         }
-    }
 
-    class InputPanel extends CustomPanel {
-    }
+        private class MyDocumentListener implements DocumentListener {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                if (editingPrediction) {
+                    return;
+                }
+                predictionOffset += e.getLength();
+            }
 
-    class OutputPanel extends CustomPanel {
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                if (editingPrediction) {
+                    return;
+                }
+                predictionOffset -= e.getLength();
+            }
 
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+            }
+        }
     }
 
 }
