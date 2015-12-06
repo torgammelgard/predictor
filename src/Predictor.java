@@ -56,10 +56,7 @@ public class Predictor {
     }
 
     public void update(char[] characters) {
-        if (characters.length > WORD_DEPTH) {
-            firePrediction("");
-            return;
-        }
+
         String inString = String.valueOf(characters);
         String startStr = "";
 
