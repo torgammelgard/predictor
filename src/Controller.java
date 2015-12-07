@@ -1,3 +1,5 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -5,7 +7,7 @@ import java.awt.event.KeyListener;
  * @author Tor Gammelgard
  * @version 2015-11-30
  */
-public class Controller implements KeyListener {
+public class Controller implements KeyListener, ActionListener {
 
     /** Model */
     Predictor predictor;
@@ -19,8 +21,18 @@ public class Controller implements KeyListener {
 
         // setup the listeners
         view.getInputPanel().addKeyListenerOnTextPane(this);
+        view.getLearnBtn().addActionListener(this);
         predictor.setPredictorListener(view);
+
     }
+
+    // ActionListener implementation
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        predictor.learnFromFile("src/shakespeare-hamlet-25.txt");
+    }
+
 
     // KeyListener implementation
 

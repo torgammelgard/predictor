@@ -14,6 +14,7 @@ import java.awt.event.KeyListener;
 public class View extends JFrame implements PredictorListener {
 
     private InputPanel inputPanel;
+    private JButton learnBtn;
     private boolean editingPrediction = false;
 
     public View() {
@@ -27,6 +28,10 @@ public class View extends JFrame implements PredictorListener {
         Border insideBorder = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
         Border border = BorderFactory.createCompoundBorder(outsideBorder, insideBorder);
         inputPanel.setBorder(border);
+
+        learnBtn = new JButton("Learn from text file");
+        add(learnBtn);
+
         setTitle("Predictor");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         pack();
@@ -43,6 +48,9 @@ public class View extends JFrame implements PredictorListener {
         return inputPanel;
     }
 
+    public JButton getLearnBtn() {
+        return learnBtn;
+    }
 
     private void setPrediction(String prediction) {
         inputPanel.appendPrediction(prediction);

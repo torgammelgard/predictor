@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +38,25 @@ public class Predictor {
             me.setPrediction(prediction);
             listener.predictionChanged(me);
         }
+    }
+
+    public void learnFromFile(String filename) {
+        try {
+            FileReader fileReader = new FileReader(filename);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] words;
+                words = line.split(" ");
+                for (String word : words)
+                    addWord(word);
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found.");
+        } catch (IOException e) {
+            System.out.println("Couldn't read file.");
+        }
+
     }
 
     /**
