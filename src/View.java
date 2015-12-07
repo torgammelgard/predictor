@@ -15,6 +15,7 @@ public class View extends JFrame implements PredictorListener {
 
     InputPanel inputPanel;
     String prediction;
+    boolean editingPrediction = false;
 
     public View() {
 
@@ -48,12 +49,11 @@ public class View extends JFrame implements PredictorListener {
         String prediction = event.getPrediction();
         setPrediction(prediction);
     }
-
-
     class InputPanel extends JPanel {
         protected JTextPane textPane;
         StyledDocument doc;
         String appendedPrediction = "";
+
         int predictionOffset = 0;
 
         InputPanel() {
@@ -63,6 +63,9 @@ public class View extends JFrame implements PredictorListener {
                     // making the document contain ONE line only
                     if (str.equals("\n"))
                         return;
+                    if (str.equals("\t")) {
+                        return;
+                    }
                     super.insertString(offs, str, a);
                 }
             };
@@ -81,8 +84,6 @@ public class View extends JFrame implements PredictorListener {
         public void addKeyListenerOnTextPane(KeyListener listener) {
             textPane.addKeyListener(listener);
         }
-
-        boolean editingPrediction = false;
 
         public void appendPrediction(String prediction) {
             if (appendedPrediction.length() > 0) {
@@ -121,6 +122,15 @@ public class View extends JFrame implements PredictorListener {
         public String getInput() {
             String str = textPane.getText();
             return (appendedPrediction.equals("")) ? str : str.substring(0, predictionOffset);
+        }
+
+        public void tabAction() {
+            try {
+                doc.insertString(predictionOffset, appendedPrediction, textPane.getInputAttributes());
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
+            setPrediction("");
         }
 
         public void reset() {

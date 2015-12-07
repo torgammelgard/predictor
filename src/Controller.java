@@ -35,6 +35,8 @@ public class Controller implements KeyListener {
         if (e.getKeyChar() == KeyEvent.VK_ENTER) {
             predictor.addWord(view.getInputPanel().getInput());
             view.getInputPanel().reset();
+        } else if (e.getKeyChar() == KeyEvent.VK_TAB) {
+            view.getInputPanel().tabAction();
         }
         else {
             predictor.update(view.getInputPanel().getInput().toCharArray());
