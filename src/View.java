@@ -13,9 +13,8 @@ import java.awt.event.KeyListener;
  */
 public class View extends JFrame implements PredictorListener {
 
-    InputPanel inputPanel;
-    String prediction;
-    boolean editingPrediction = false;
+    private InputPanel inputPanel;
+    private boolean editingPrediction = false;
 
     public View() {
 
@@ -35,37 +34,49 @@ public class View extends JFrame implements PredictorListener {
         setVisible(true);
     }
 
+    /**
+     * Getter
+     *
+     * @return the input panel
+     */
     public InputPanel getInputPanel() {
         return inputPanel;
     }
 
+
     private void setPrediction(String prediction) {
-        this.prediction = prediction;
         inputPanel.appendPrediction(prediction);
     }
 
+    /**
+     * Implementation of the <code>PredictionListener</code>.
+     *
+     * @param event the prediction event sent from the Predictor
+     */
     @Override
     public void predictionChanged(PredictionEvent event) {
         String prediction = event.getPrediction();
         setPrediction(prediction);
     }
-    class InputPanel extends JPanel {
+
+
+    /**
+     * A panel for displaying input and predictions
+     */
+    public class InputPanel extends JPanel {
+
         protected JTextPane textPane;
-        StyledDocument doc;
-        String appendedPrediction = "";
+        private StyledDocument doc;
+        private String appendedPrediction = "";
+        private int predictionOffset = 0;
 
-        int predictionOffset = 0;
-
-        InputPanel() {
+        public InputPanel() {
             doc = new DefaultStyledDocument() {
                 @Override
                 public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
                     // making the document contain ONE line only
-                    if (str.equals("\n"))
+                    if (str.equals("\n") || str.equals("\t"))
                         return;
-                    if (str.equals("\t")) {
-                        return;
-                    }
                     super.insertString(offs, str, a);
                 }
             };
@@ -81,10 +92,20 @@ public class View extends JFrame implements PredictorListener {
             add(scrollPane);
         }
 
+        /**
+         * Adds a key listener to the text pane.
+         *
+         * @param listener a key listener
+         */
         public void addKeyListenerOnTextPane(KeyListener listener) {
             textPane.addKeyListener(listener);
         }
 
+        /**
+         * Appends the prediction to the input string
+         *
+         * @param prediction the prediction string
+         */
         public void appendPrediction(String prediction) {
             if (appendedPrediction.length() > 0) {
                 try {
@@ -119,11 +140,19 @@ public class View extends JFrame implements PredictorListener {
 
         }
 
+        /**
+         * Getter
+         *
+         * @return the input string
+         */
         public String getInput() {
             String str = textPane.getText();
             return (appendedPrediction.equals("")) ? str : str.substring(0, predictionOffset);
         }
 
+        /**
+         * Action associated with the TAB button
+         */
         public void tabAction() {
             try {
                 doc.insertString(predictionOffset, appendedPrediction, textPane.getInputAttributes());
@@ -133,16 +162,22 @@ public class View extends JFrame implements PredictorListener {
             setPrediction("");
         }
 
+        /**
+         * Resets the text pane.
+         */
         public void reset() {
             textPane.setText("");
             appendedPrediction = "";
             predictionOffset = 0;
         }
 
+        /**
+         * A listener that keeps track of where the appended prediction is
+         * and skips updating the offset value if we are in editing prediction mode.
+         * (These methods are called everytime any sort of inserting or removing is made on the document)
+         */
         private class MyDocumentListener implements DocumentListener {
-            // keeps track of where the appended prediction is
-            // and skips updating the offset if we are in editing prediction mode
-            // (these are called everytime any sort of inserting or removing is made on the document)
+
             @Override
             public void insertUpdate(DocumentEvent e) {
                 if (editingPrediction) {

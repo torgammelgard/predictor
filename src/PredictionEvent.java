@@ -12,10 +12,20 @@ public class PredictionEvent extends EventObject {
         super(predictor);
     }
 
+    /**
+     * Setter
+     *
+     * @param prediction new prediction string
+     */
     public void setPrediction(String prediction){
         this.prediction = prediction;
     }
 
+    /**
+     * Getter
+     *
+     * @return the stored prediction
+     */
     public String getPrediction() {
         return prediction;
     }

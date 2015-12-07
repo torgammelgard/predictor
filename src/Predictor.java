@@ -7,21 +7,31 @@ import java.util.Map;
  */
 public class Predictor {
 
+    /** The predictor stores added words in a map, where the maximum length of the key is WORD_DEPTH. */
     public static final int WORD_DEPTH = 3;
 
-    Map<String, Map<String, Integer>> database;
-
+    private Map<String, Map<String, Integer>> database;
     private PredictorListener listener;
 
     public Predictor() {
         database = new HashMap<>();
     }
 
+    /**
+     * Setter
+     *
+     * @param listener a prediction listener
+     */
     public void setPredictorListener(PredictorListener listener) {
         this.listener = listener;
     }
 
-    public void firePrediction(String prediction) {
+    /**
+     * Notifies the predictor listener everytime a prediction change is made.
+     *
+     * @param prediction the prediction to be broadcasted
+     */
+    private void firePrediction(String prediction) {
         if (listener != null) {
             PredictionEvent me = new PredictionEvent(this);
             me.setPrediction(prediction);
@@ -55,6 +65,11 @@ public class Predictor {
         }
     }
 
+    /**
+     * Updates the characters on which the predictor makes its prediction.
+     *
+     * @param characters an array of input characters
+     */
     public void update(char[] characters) {
         if (characters.length > WORD_DEPTH) {
             firePrediction("");
@@ -76,6 +91,12 @@ public class Predictor {
             firePrediction("");
     }
 
+    /**
+     * Finds a prediction based on the database.
+     *
+     * @param predictionMap a prediction map from the database
+     * @return a prediction
+     */
     private String findMostLikelyCandidate(Map<String, Integer> predictionMap) {
         int max = 0;
         String prediction = "";

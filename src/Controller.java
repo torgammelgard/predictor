@@ -6,17 +6,20 @@ import java.awt.event.KeyListener;
  * @version 2015-11-30
  */
 public class Controller implements KeyListener {
+
+    /** Model */
     Predictor predictor;
 
+    /** View */
     View view;
 
-    public Controller(Predictor m, View v) {
-        predictor = m;
-        view = v;
+    public Controller(Predictor predictor, View view) {
+        this.predictor = predictor;
+        this.view = view;
 
         // setup the listeners
-        v.getInputPanel().addKeyListenerOnTextPane(this);
-        m.setPredictorListener(v);
+        view.getInputPanel().addKeyListenerOnTextPane(this);
+        predictor.setPredictorListener(view);
     }
 
     // KeyListener implementation
