@@ -14,10 +14,10 @@ public class Controller implements KeyListener {
         predictor = m;
         view = v;
 
+        // setup the listeners
         v.getInputPanel().addKeyListenerOnTextPane(this);
         m.setPredictorListener(v);
     }
-
 
     // KeyListener implementation
 

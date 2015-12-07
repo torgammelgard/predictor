@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
@@ -17,11 +19,14 @@ public class View extends JFrame implements PredictorListener {
     public View() {
 
         inputPanel = new InputPanel();
-
         setLayout(new FlowLayout());
         add(inputPanel);
-        add(inputPanel);
 
+        getContentPane().setBackground(new Color(75, 75, 75));
+        Border outsideBorder = BorderFactory.createEmptyBorder(15, 15, 15, 15);
+        Border insideBorder = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
+        Border border = BorderFactory.createCompoundBorder(outsideBorder, insideBorder);
+        inputPanel.setBorder(border);
         setTitle("Predictor");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         pack();
@@ -51,7 +56,6 @@ public class View extends JFrame implements PredictorListener {
         String appendedPrediction = "";
         int predictionOffset = 0;
 
-        // help from java2s.com
         InputPanel() {
             doc = new DefaultStyledDocument() {
                 @Override
@@ -64,10 +68,12 @@ public class View extends JFrame implements PredictorListener {
             };
 
             doc.addDocumentListener(new MyDocumentListener());
+            setBackground(new Color(138, 138, 138));
             textPane = new JTextPane(doc);
             textPane.setEditable(true);
-            textPane.setPreferredSize(new Dimension(400, 100));
-            textPane.setFont(new Font("Serif", Font.PLAIN, 48));
+            textPane.setPreferredSize(new Dimension(600, 100));
+            textPane.setFont(new Font("Serif", Font.BOLD, 72));
+            textPane.setBackground(Color.LIGHT_GRAY);
             JScrollPane scrollPane = new JScrollPane(textPane);
             add(scrollPane);
         }
@@ -113,14 +119,20 @@ public class View extends JFrame implements PredictorListener {
         }
 
         public String getInput() {
-            return textPane.getText().replace(appendedPrediction, "");
+            String str = textPane.getText();
+            return (appendedPrediction.equals("")) ? str : str.substring(0, predictionOffset);
         }
 
         public void reset() {
             textPane.setText("");
+            appendedPrediction = "";
+            predictionOffset = 0;
         }
 
         private class MyDocumentListener implements DocumentListener {
+            // keeps track of where the appended prediction is
+            // and skips updating the offset if we are in editing prediction mode
+            // (these are called everytime any sort of inserting or removing is made on the document)
             @Override
             public void insertUpdate(DocumentEvent e) {
                 if (editingPrediction) {
