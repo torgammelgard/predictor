@@ -48,6 +48,11 @@ public class View extends JFrame implements PredictorListener {
         return inputPanel;
     }
 
+    /**
+     * Getter
+     *
+     * @return the learning button
+     */
     public JButton getLearnBtn() {
         return learnBtn;
     }
