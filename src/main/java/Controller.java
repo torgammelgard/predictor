@@ -30,7 +30,7 @@ public class Controller implements KeyListener, ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        predictor.learnFromFile("src/shakespeare-hamlet-25.txt");
+        predictor.learnFromFile("src/main/resources/shakespeare-hamlet-25.txt");
     }
 
 
